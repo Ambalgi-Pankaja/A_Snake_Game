@@ -35,6 +35,7 @@ foodSpawn = True
 direction = 'RIGHT'
 changeTo = direction
 
+score = 0
 # Game over function
 def gameOver():
     myFont = pygame.font.SysFont('calibri', 72)
@@ -42,11 +43,22 @@ def gameOver():
     GOrect = GOSurf.get_rect()
     GOrect.midtop = (360, 15)
     playSurface.blit(GOSurf, GOrect)
+    showScore(0)
     pygame.display.flip()
-
-    time.sleep(10)
+    time.sleep(5)
     pygame.quit() #pygame quit
     sys.exit() #console exit
+
+def showScore(choice):
+    sFont = pygame.font.SysFont('calibri', 24)
+    sSurf = sFont.render('Score: {0}'.format(score), True, black)
+    sRect = sSurf.get_rect()
+    if choice == 1:
+        sRect.midtop = (80, 10)
+    else:
+        sRect.midtop = (360,120)
+    playSurface.blit(sSurf, sRect)
+
 
 # Main Logic of the game
 while True:
@@ -88,6 +100,7 @@ while True:
 
     snakeBody.insert(0, list(snakePos))
     if snakePos[0] == foodPos[0] and snakePos[1] == foodPos[1]:
+        score += 1
         foodSpawn = False
     else:
         snakeBody.pop()
@@ -104,5 +117,17 @@ while True:
         pygame.draw.rect(playSurface, green, pygame.Rect(pos[0],pos[1],10,10))
 
     pygame.draw.rect(playSurface, brown, pygame.Rect(foodPos[0], foodPos[1], 10, 10))
+
+    #Boundry set up
+    if snakePos[0] > 710 or snakePos[0] < 0:
+        gameOver()
+    if snakePos[1] > 450 or snakePos[1] < 0:
+        gameOver()
+    #Self eating
+    for block in snakeBody[1:]:
+        if snakePos[0] == block[0] and snakePos[1] == block[1]:
+            gameOver()
+
+    showScore(1)
     pygame.display.flip()
     fpsController.tick(25)
